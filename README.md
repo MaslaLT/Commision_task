@@ -34,7 +34,7 @@ $ composer run test
 # Task
 ## Situation
 
-Paysera users can go to a branch to cash in and/or cash out from Paysera account. Several currencies are supported. There are also commission fees for both cash in and cash out.
+Users can go to a branch to cash in and/or cash out from account. Several currencies are supported. There are also commission fees for both cash in and cash out.
 
 ## Commission Fees
 
