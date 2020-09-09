@@ -1,4 +1,4 @@
-# Masel Commission task
+# Masel Commission Task Solution
 
 ## Requirements:
 
@@ -28,6 +28,7 @@ For all tests:
 ``
 $ composer run test
 ``
+
 
 
 # Task
