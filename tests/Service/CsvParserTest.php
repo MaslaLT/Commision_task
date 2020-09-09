@@ -2,7 +2,6 @@
 
 namespace Masel\CommissionTask\Tests\Service;
 
-use Masel\CommissionTask\Exceptions\WrongFileTypePassed;
 use Masel\CommissionTask\Service\CsvParser;
 use Masel\CommissionTask\Service\ScriptArgumentsManager;
 use PHPUnit\Framework\TestCase;
