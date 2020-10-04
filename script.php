@@ -1,29 +1,47 @@
 <?php
 
-use Masel\CommissionTask\Currency\Currency;
-use Masel\CommissionTask\Currency\CurrencyList;
-use Masel\CommissionTask\Fees\CashIn;
-use Masel\CommissionTask\Fees\CashOut;
-use Masel\CommissionTask\Service\CommissionFeeCalculator;
-use Masel\CommissionTask\Service\ScriptArgumentsManager;
-
 require_once __DIR__.'/vendor/autoload.php';
 
-$arguments = new ScriptArgumentsManager($argv);
+use Masel\CommissionTask\Fees\CashIn;
+use Masel\CommissionTask\Fees\CashOut;
+use Masel\CommissionTask\Money\Money;
+use Masel\CommissionTask\Resources\FixedExchangeRatesData;
+use Masel\CommissionTask\Service\CommissionCalculator;
+use Masel\CommissionTask\Service\CsvParser;
+use Masel\CommissionTask\Service\FixedCurrencyListBuilder;
+use Masel\CommissionTask\service\FixedExchangeRateProvider;
+use Masel\CommissionTask\Service\MoneyExchanger;
+use Masel\CommissionTask\Service\ScriptArgumentsProvider;
+use Masel\CommissionTask\Service\TransactionsBuilder;
+use Masel\CommissionTask\Service\DateManager;
+use Masel\CommissionTask\Transaction\ThisWeekTransactions;
+use Masel\CommissionTask\Resources\IsoCurrencyPredefinedData;
 
-$cashInFee = new CashIn();
-$cashOutFee = new CashOut();
+$scriptArguments = new ScriptArgumentsProvider(2);
+$fileName = $scriptArguments->getArgument(1);
+$parsedCsvArray = new CsvParser($fileName);
 
-$usd = new Currency(0.01, 1.1497, 'usd');
-$eur = new Currency(0.01, 1, 'eur');
-$jpy = new Currency(1, 129.53, 'jpy');
-$currencyList = new CurrencyList();
-$currencyList = $currencyList->addCurrency($usd)->addCurrency($eur)->addCurrency($jpy);
+$currencyListBuilder = new FixedCurrencyListBuilder(new IsoCurrencyPredefinedData());
+$CurrencyList = $currencyListBuilder->getFixedRateCurrenciesList();
 
-$commissionFeeCalculator = new CommissionFeeCalculator($cashInFee, $cashOutFee, $currencyList);
-try {
-    $commissionFeeCalculator->fromCsv($arguments, '1');
-} catch (Exception $e) {
-    die(PHP_EOL.$e->getMessage().PHP_EOL);
+$fixedExchangeRateProvider = new FixedExchangeRateProvider(FixedExchangeRatesData::getRates());
+$moneyExchanger = new MoneyExchanger($fixedExchangeRateProvider);
+
+$transactionsBuilder = new TransactionsBuilder($CurrencyList);
+
+$FiveEuro = new Money($CurrencyList->getCurrency('eur'), 5);
+$pointFiveEuro = new Money($CurrencyList->getCurrency('eur'), 0.5);
+$thousandEuro = new Money($CurrencyList->getCurrency('eur'), 1000);
+
+$cashIn = new CashIn(0.0003, $FiveEuro);
+$cashOut = new CashOut(0.003, 3, $thousandEuro, $pointFiveEuro);
+
+
+$transactions = $transactionsBuilder->fromCsv($parsedCsvArray);
+$ThisWeekTransactions = new ThisWeekTransactions(new DateManager(), $moneyExchanger);
+$commissionCalculator = new CommissionCalculator($cashIn, $cashOut, $moneyExchanger, $ThisWeekTransactions);
+
+foreach ($transactions as $transaction) {
+    $fee = $commissionCalculator->calculateFee($transaction);
+    echo $fee.PHP_EOL;
 }
-$commissionFeeCalculator->printCalculatedFee();

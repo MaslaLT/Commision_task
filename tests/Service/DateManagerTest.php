@@ -2,43 +2,39 @@
 
 namespace Masel\CommissionTask\Tests\Service;
 
+use DateTime;
 use Masel\CommissionTask\Service\DateManager;
 use PHPUnit\Framework\TestCase;
 
 class DateManagerTest extends TestCase
 {
-    /**
-     * @var DateManager
-     */
-    protected $dateManager;
+    private $dateManager;
 
     public function setUp()
     {
         $this->dateManager = new DateManager();
     }
 
-    public function testWeekFromDate()
+    /**
+     * @param $date1 string
+     * @param $date2 string
+     * @param $expected bool
+     *
+     * @dataProvider dataSameWeekTesting
+     */
+    public function testSameWeek($date1, $date2, $expected)
     {
-        $weekFromDate = $this->dateManager->weekFromDate('1999-01-11');
-        $this->assertEquals('02', $weekFromDate);
+        $lastWeek = new DateTime($date1);
+        $date = new DateTime($date2);
+        $this->assertEquals($expected, $this->dateManager->sameWeek($lastWeek, $date));
     }
 
-    public function testSameWeek()
+    public function dataSameWeekTesting(): array
     {
-        $weekFromDate1 = '1999-01-09';
-        $weekFromDate2 = '1999-01-10';
-
-        $comparisonResult = $this->dateManager->sameWeek($weekFromDate1, $weekFromDate2);
-        $this->assertEquals(true, $comparisonResult);
+        return [
+            'same week' => ['2014-12-31', '2015-01-01', true],
+            'same week different year' => ['2014-12-31', '2015-12-31', false],
+            'not same week' => ['2014-12-31', '2015-01-07', false],
+        ];
     }
-
-    public function testSameWeekReturnsFalse()
-    {
-        $weekFromDate1 = '1999-01-09';
-        $weekFromDate2 = '1999-02-11';
-
-        $comparisonResult = $this->dateManager->sameWeek($weekFromDate1, $weekFromDate2);
-        $this->assertEquals(false, $comparisonResult);
-    }
-
 }

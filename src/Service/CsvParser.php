@@ -6,24 +6,21 @@ namespace Masel\CommissionTask\Service;
 
 class CsvParser
 {
+    const TYPE_CSV = 'csv';
+
     /**
-     * Array of parsed csv file rows.
-     * Every row is new array element.
-     *
      * @var array
      */
-    protected $parsedCsvRows;
+    private $parsedCsvRows;
 
     /**
-     * Full name of file.
-     *
      * @var string
      */
-    protected $fileName;
+    private $fileName;
 
-    public function __construct(ScriptArgumentsManager $scriptArguments, string $argumentId)
+    public function __construct(string $fileName)
     {
-        $this->fileName = $scriptArguments->getArgument($argumentId);
+        $this->fileName = $fileName;
         $this->parseCsvFile();
     }
 
@@ -34,23 +31,33 @@ class CsvParser
 
     private function parseCsvFile(): CsvParser
     {
-        $this->validateFileType('csv');
+        if ($this->isValidFileType()) {
+            $this->readFile();
 
-        $handle = fopen($this->fileName, 'r');
-        while (false !== ($raw_string = fgets($handle))) {
-            $row = str_getcsv($raw_string);
-            $this->parsedCsvRows[] = $row;
+            return $this;
         }
-
-        return $this;
+        throw new \Exception('Wrong file type passed .csv Expected');
     }
 
-    private function validateFileType(string $fileType)
+    /**
+     * @throws \Exception
+     */
+    private function isValidFileType(): bool
     {
         $ext = pathinfo($this->fileName, PATHINFO_EXTENSION);
 
-        if ($ext !== $fileType) {
-            throw new \Exception("Wrong file type passed. $fileType Expected");
+        if ($this::TYPE_CSV === $ext) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function readFile()
+    {
+        $handle = fopen($this->fileName, 'r');
+        while (false !== ($raw_string = fgets($handle))) {
+            $this->parsedCsvRows[] = str_getcsv($raw_string);
         }
     }
 }

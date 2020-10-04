@@ -4,30 +4,26 @@ declare(strict_types=1);
 
 namespace Masel\CommissionTask\Fees;
 
+use Masel\CommissionTask\Money\Money;
+
 class CashIn
 {
+    const CASH_IN = 'cash_in';
+
     /**
-     * Fee for one operation.
-     *
      * @var float
      */
-    protected $singleOperationFee;
+    private $singleOperationFee;
 
     /**
-     * CashIn constructor.
-     *
-     * @param float
+     * @var Money
      */
-    public function __construct(float $singleOperationFee = 0.0003)
+    private $maxOperationFee;
+
+    public function __construct(float $singleOperationFee, Money $maxOperationFee)
     {
         $this->singleOperationFee = $singleOperationFee;
-
-        return $this;
-    }
-
-    public function setSingleOperationFee(float $fee)
-    {
-        $this->singleOperationFee = $fee;
+        $this->maxOperationFee = $maxOperationFee;
 
         return $this;
     }
@@ -35,5 +31,10 @@ class CashIn
     public function getSingleOperationFee(): float
     {
         return $this->singleOperationFee;
+    }
+
+    public function getMaxOperationFee(): Money
+    {
+        return $this->maxOperationFee;
     }
 }

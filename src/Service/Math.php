@@ -17,4 +17,9 @@ class Math
     {
         return bcadd($leftOperand, $rightOperand, $this->scale);
     }
+
+    public function sub(string $leftOperand, string $rightOperand): string
+    {
+        return bcsub($leftOperand, $rightOperand, $this->scale);
+    }
 }

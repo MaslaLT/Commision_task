@@ -4,40 +4,36 @@ declare(strict_types=1);
 
 namespace Masel\CommissionTask\Fees;
 
+use Masel\CommissionTask\Money\Money;
+
 class CashOut
 {
+    const CASH_OUT = 'cash_out';
+
     /**
-     * Fee for single cash out operation.
-     *
      * @var float
      */
     protected $singleOperationFee;
 
     /**
-     * Set how much free cash outs can be done.
-     *
      * @var int
      */
     protected $freeOperationsPerWeek;
 
     /**
-     * Amount of free cash out sum per week in EUR.
-     *
-     * @var int
+     * @var Money
      */
     protected $freeCashOutPerWeek;
 
     /**
-     * One operation minimal fee for legal person in EUR.
-     *
-     * @var float
+     * @var Money
      */
     protected $legalCashOutMin;
 
-    public function __construct(float $singleOperationFee = 0.003,
-                                int $freeOperationsPerWeek = 3,
-                                int $freeCashOutPerWeek = 1000,
-                                float $legalCashOutMin = 0.5)
+    public function __construct(float $singleOperationFee,
+                                int $freeOperationsPerWeek,
+                                Money $freeCashOutPerWeek,
+                                Money $legalCashOutMin)
     {
         $this->singleOperationFee = $singleOperationFee;
         $this->freeOperationsPerWeek = $freeOperationsPerWeek;
@@ -47,23 +43,9 @@ class CashOut
         return $this;
     }
 
-    public function setSingleOperationFee(float $fee): CashOut
-    {
-        $this->singleOperationFee = $fee;
-
-        return $this;
-    }
-
     public function getSingleOperationFee(): float
     {
         return $this->singleOperationFee;
-    }
-
-    public function setFreeOperationsPerWeek(int $operations): CashOut
-    {
-        $this->freeOperationsPerWeek = $operations;
-
-        return $this;
     }
 
     public function getFreeOperationsPerWeek(): int
@@ -71,35 +53,13 @@ class CashOut
         return $this->freeOperationsPerWeek;
     }
 
-    public function setFreeCashOutPerWeek(int $cashOutSum): CashOut
-    {
-        $this->freeCashOutPerWeek = $cashOutSum;
-
-        return $this;
-    }
-
-    public function getFreeCashOutPerWeek(): int
+    public function getFreeCashOutPerWeek(): Money
     {
         return $this->freeCashOutPerWeek;
     }
 
-    public function setLegalCashOutMin($legalCashOutMin)
-    {
-        $this->legalCashOutMin = $legalCashOutMin;
-    }
-
-    public function getLegalCashOutMin(): float
+    public function getLegalCashOutMin(): Money
     {
         return $this->legalCashOutMin;
-    }
-
-    public function getCashOutFees(): array
-    {
-        return [
-            'singleOperation' => $this->singleOperationFee,
-            'freeOperationsPerWeek' => $this->freeOperationsPerWeek,
-            'freeCashOutPerWeek' => $this->freeCashOutPerWeek,
-            'legalCashOutMin' => $this->legalCashOutMin,
-        ];
     }
 }

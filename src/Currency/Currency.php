@@ -4,80 +4,63 @@ declare(strict_types=1);
 
 namespace Masel\CommissionTask\Currency;
 
-class Currency implements CurrencyInterface
+abstract class Currency
 {
-    /**
-     * Smallest currency item of this currency.
-     *
-     * As an example, Euro currency smallest item is one cent (1/100).
-     * So $smallestCurrencyItem = 0.01.
-     *
-     * @var float
-     */
-    protected $smallestCurrencyItem;
+    const MAX_DECIMALS_DIGITS = 6;
 
     /**
-     * Conversion rate of this currency in euro.
-     *
-     * @var float
+     * @var int
      */
-    protected $conversionRateToEuro;
+    protected $decimals;
 
     /**
-     * Currency Code.
-     *
-     * As an example, Euro currency code is Eur.
+     * IsoCurrency Code.
      *
      * @var string
      */
     protected $code;
 
-    public function __construct(float $smallestCurrencyItem, float $conversionRateToEuro, string $code)
+    /**
+     * @var string
+     */
+    protected $name;
+
+    public function setName(string $name)
     {
-        $this->smallestCurrencyItem = $smallestCurrencyItem;
-        $this->conversionRateToEuro = $conversionRateToEuro;
-        $this->code = strtoupper($code);
+        $this->name = $name;
     }
 
-    public function getSmallestCurrencyItem(): float
+    public function getName(): string
     {
-        return $this->smallestCurrencyItem;
+        return $this->name;
     }
 
-    public function setSmallestCurrencyItem(float $smallestCurrencyItem)
+    public function getDecimals(): int
     {
-        $this->smallestCurrencyItem = $smallestCurrencyItem;
+        return $this->decimals;
     }
 
-    public function getConversionRateToEuro(): float
+    /**
+     * @throws \Exception
+     */
+    public function setDecimals(int $decimals)
     {
-        return $this->conversionRateToEuro;
-    }
-
-    public function setConversionRateToEuro(float $conversionRateToEuro)
-    {
-        $this->conversionRateToEuro = $conversionRateToEuro;
+        if ($decimals < 0) {
+            throw new \Exception('Decimal cant be negative number');
+        }
+        if ($decimals > $this::MAX_DECIMALS_DIGITS) {
+            throw new \Exception('Decimals to long number.');
+        }
+        $this->decimals = $decimals;
     }
 
     public function getCode(): string
     {
-        return strtoupper($this->code);
+        return $this->code;
     }
 
     public function setCode(string $code)
     {
         $this->code = strtoupper($code);
-    }
-
-    public function getDecimals(): int
-    {
-        $currencySmallestItem = $this->smallestCurrencyItem;
-        $decimal = 0;
-        while ($currencySmallestItem < 1) {
-            $currencySmallestItem = $currencySmallestItem * 10;
-            ++$decimal;
-        }
-
-        return $decimal;
     }
 }

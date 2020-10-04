@@ -7,30 +7,37 @@ namespace Masel\CommissionTask\Currency;
 class CurrencyList
 {
     /**
-     * List of currency objects.
+     * @var array
      */
-    private $currencyList = [];
+    protected $currencies;
 
-    public function addCurrency(Currency $currency): CurrencyList
+    /**
+     * @throws \Exception
+     */
+    public function addIsoCurrency(IsoCurrency $currency)
     {
-        $this->currencyList[$currency->getCode()] = $currency;
-
-        return $this;
+        if (!is_array($this->currencies)) {
+            $this->currencies = [];
+        }
+        if (in_array($currency->getCode(), $this->currencies, true)) {
+            throw new \Exception(sprintf('Currency name %s already exists. '.$currency->getCode()));
+        }
+        $this->currencies[$currency->getCode()] = $currency;
     }
 
     /**
-     * Array list of currency objects.
-     */
-    public function getAll(): array
-    {
-        return $this->currencyList;
-    }
-
-    /**
-     * Returns currency object by its currency code.
+     * @throws \Exception
      */
     public function getCurrency(string $code): Currency
     {
-        return $this->currencyList[strtoupper($code)];
+        /** @var Currency $currency */
+        $upCaseCode = strtoupper($code);
+        foreach ($this->currencies as $currency) {
+            if ($upCaseCode === $currency->getCode()) {
+                return $currency;
+            }
+        }
+
+        throw new \Exception('No '.$code.' in list.');
     }
 }

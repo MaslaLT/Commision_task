@@ -2,35 +2,31 @@
 
 namespace Masel\CommissionTask\Tests\Fees;
 
+use Masel\CommissionTask\Currency\IsoCurrency;
 use Masel\CommissionTask\Fees\CashIn;
+use Masel\CommissionTask\Money\Money;
 use PHPUnit\Framework\TestCase;
 
 class CashInTest extends TestCase
 {
-    /**
-     * @var CashIn
-     */
     private $cashIn;
+    private $moneyFee;
 
     public function setUp()
     {
-        $this->cashIn = new CashIn();
-    }
-
-    public function testSetSingleOperationFee()
-    {
-        $this->cashIn->setSingleOperationFee(0.055);
-        $this->assertEquals(0.055, $this->cashIn->getSingleOperationFee());
+        $isoCurrency = new IsoCurrency();
+        $this->moneyFee = new Money($isoCurrency, 99);
+        $this->cashIn = new CashIn(0.5, $this->moneyFee);
     }
 
     public function testGetSingleOperationFee()
     {
-        $this->cashIn->setSingleOperationFee(0.055);
-        $this->assertEquals(0.055, $this->cashIn->getSingleOperationFee());
+        $this->assertEquals(0.5, $this->cashIn->getSingleOperationFee());
     }
 
-    public function test__construct()
+    public function testGetMaxOperationFee()
     {
-        $this->assertEquals(0.0003, $this->cashIn->getSingleOperationFee());
+        $this->assertEquals($this->moneyFee, $this->cashIn->getMaxOperationFee());
     }
+
 }
